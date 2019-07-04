@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Page Title</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+	<script>
+		function BinarySearchTree () {
+			var node,
+				root = null,
+				inOrderTraverseNode,
+				preOrderTraverseNode,
+				postOrderTraverseNode;
+
+			node = function (key) {
+				this.key = key;
+				this.left = null;
+				this.right = null;
+			}
+
+			this.inOrderTraverse = function(callback){
+				inOrderTraverseNode(root, callback);
+			}; 
+
+			inOrderTraverseNode	= function (node, callback) {
+
+				if (node !== null) {
+					inOrderTraverseNode(node.left,	callback);
+					callback(node.key);
+					inOrderTraverseNode(node.right,	callback);
+				} 
+			}; 
+
+			this.preOrderTraverse = function(callback){
+				preOrderTraverseNode(root, callback);
+			}; 
+
+			preOrderTraverseNode = function (node, callback) {
+
+				if (node !== null) {
+					callback(node.key);
+					preOrderTraverseNode(node.left, callback);
+					preOrderTraverseNode(node.right, callback);
+				}
+			}
+
+			this.postOrderTraverse = function(callback){
+				postOrderTraverseNode(root,	callback);
+			}; 
+
+			postOrderTraverseNode = function (node, callback) {
+
+				if (node !== null) {
+					postOrderTraverseNode(node.left, callback);
+					postOrderTraverseNode(node.right, callback);
+					callback(node.key);
+				} 
+			}
+
+			this.minimunValue = function () {
+				var minimunValue;
+
+				(function _looper(root) {
+			
+					if (root.left) {
+						_looper(root.left);
+					} else {
+						minimunValue = root.key;
+					}
+				})(root);
+
+				return minimunValue;
+			}
+
+			this.maximunValue = function () {
+				var maximunValue;
+
+				(function _looper(root) {
+			
+					if (root.right) {
+						_looper(root.right);
+					} else {
+						maximunValue = root.key;
+					}
+				})(root);
+
+				return maximunValue;
+			}
+
+			this.search = function (key) {
+				var nodeFound;
+
+				function isValue(node){
+					
+					if (node && key === node.key) {
+						nodeFound = node;
+					}
+				}
+
+				(function _looper(root, callback) {
+
+					if (root !== null) {
+
+						if (key < root.key) {
+							_looper(root.left, callback);
+							callback(root.left);
+						} else if (key > root.key ) {
+							_looper(root.right, callback);
+							callback(root.right);
+						}
+					}
+				})(root, isValue);
+
+				return nodeFound;
+			}
+
+			this.remove = function (key) {
+			
+				//LIBRO 
+/*
+				var findMinNode = function (node) {
+
+					var minimunNode;
+
+					(function _loopers(root) {
+				
+						if (root.left) {
+							_loopers(root.left);
+						} else {
+							minimunNode = root;
+						}
+					})(root);
+
+					return minimunNode;
+				}
+
+				var	removeNode	=	function(node,	key){
+
+					if	(node	===	null){	
+						return	null;				
+					}				
+
+					if	(key < node.key){
+						node.left =	removeNode(node.left, key);
+						return	node;
+					} else if (key > node.key){
+						node.right = removeNode(node.right,	key);
+
+						return	node;
+					} else {
+						if (node.left	===	null &&	node.right	===	null) {
+							node = null;
+							return	node;
+						}
+						
+						if (node.left === null){
+							node = node.right;
+							return	node;	//{14}
+						} else if (node.right	===	null){
+							node = node.left;
+							return	node;
+						}
+						
+						var	aux	= findMinNode(node.right);
+							node.key	=	aux.key;	//{19}
+							node.right	=	removeNode(node.right,	aux.key);
+							return	node;	
+						} 
+					};
+
+				root = removeNode(root,	key);
+			
+*/
+
+				// DIEGO Style
+
+				function _nodeChildrenCase (node) {
+					var newNode,
+						newNodeLeft,
+						newNodeRight;
+
+					if (!node.left && !node.right) {
+						return null;
+					} else if (node.left && !node.right) {
+						return node.left;
+					} else if (!node.left && node.right) {
+						return node.right;
+					} else if (node.left && node.right) {
+						newNode = node.left;
+						newNodeLeft = newNode.left;
+						newNodeRight = newNode.right;
+						newNode.left = newNodeRight;
+						newNodeRight.left = newNodeLeft;
+						newNode.right = node.right;
+
+						return newNode;
+					}
+				} 
+
+				(function _looper(node, callback) {
+
+					if (node !== null) {
+
+						if (key < node.key) {
+							node.left = _looper(node.left);
+							return node;
+						} else if (key > node.key ) {
+							node.right = _looper(node.right);
+							return node;
+						} else if (key === node.key) {
+							node = _nodeChildrenCase(node);
+							return node;
+						}
+					}
+				})(root);
+			}
+
+			this.insert = function (key) {
+
+				function _findInsertNode(root) {
+				
+					if (!root) {
+						return;
+					}
+
+					if (key < root.key) {
+						if (!root.left) {
+							root.left = new node(key);
+						} else {
+							_findInsertNode(root.left);
+						}
+					} else {
+						if (!root.right) {
+							root.right = new node(key);
+						} else {
+							_findInsertNode(root.right);
+						}
+					}
+				}
+
+				if (root === null) {
+					root = new node(key);
+				} else {
+					_findInsertNode(root);
+				}	
+			}
+
+			this.print = function() {
+			   return root;
+			};
+		}
+
+		var tree = new BinarySearchTree();
+		
+		tree.insert(11); 
+		tree.insert(7);
+		tree.insert(15);
+		tree.insert(5);
+		tree.insert(3);
+		tree.insert(9);
+		tree.insert(8);
+		tree.insert(10);
+		tree.insert(13);
+		tree.insert(12);
+		tree.insert(14);
+		tree.insert(20);
+		tree.insert(18);
+		tree.insert(25);
+		tree.insert(6); 
+
+		function printNode(value){
+			console.log(value);
+		}
+
+		console.log(tree.remove(15));
+		console.log(tree.print()); 
+	</script>
+
+</body>
+</html>

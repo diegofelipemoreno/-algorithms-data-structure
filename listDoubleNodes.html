@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Page Title</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+	<script>
+	function DoublyLinkedList() {
+		var lenght = 0,
+			head = null,
+			tail = null,
+			Node = function(element) {
+			this.element = element;
+			this.next = null; 
+			this.prev = null; 
+		};
+
+		this.append = function(element){
+			var node =  new Node(element),
+				current,
+				previous = head;
+
+
+			if (head === null) {
+				head = node;
+			} else {
+				current = head;
+
+				while (current.next) {
+					current = current.next;
+					previous = current;
+				}
+
+				current.next = node;
+				current.next.prev = previous;
+			}
+
+			length++;
+		};
+
+	   this.insert = function(position, element){
+	   		var currentNode = lista.getNodeByIndex(position),
+	   			newNode = new Node(element);
+
+	   		if (position === 0) {
+	   			newNode.next = currentNode;
+	   		}
+
+	   		if (position > 0 && position <= length -1) {
+	   			newNode.next = currentNode.next;
+	   			newNode.prev = currentNode;
+	   			currentNode.next = newNode;
+	   		} 
+
+	   		length ++;
+	   		return head;
+	   };
+
+	   this.removeAt = function(position) {
+	   		var nodeToRemove = this.getNodeByIndex(position) || null,
+	   			current = head,
+	   			nodeToRemoveNext = nodeToRemove.next,
+	   			nodeToRemovePrev = nodeToRemove.prev || null,
+	   			newNode;
+
+	   		if (position === 0) {
+	   			current = nodeToRemove.next;
+	   			current.prev = null;
+	   			head = current;
+	   		} else if (position === length-1) {
+	   			nodeToRemovePrev.next = null;
+	   		} else {
+
+   				while (current.next) {
+   					current =  current.next;	
+
+   					if (current === nodeToRemove) {
+						newNode = nodeToRemoveNext;
+			 			newNode.prev = nodeToRemovePrev;
+			 			nodeToRemovePrev.next = newNode;
+   					}
+   				}
+   			}
+
+	   		if (position < length) {
+	   			length--;
+	   		}
+	   		return head;
+	   };
+	   this.remove = function(element) {
+	   		var nodeIndex = this.indexOf(element),
+	   			nodeBeforeIndex = nodeIndex - 1,
+	   			nodeToRemove = this.getNodeByIndex(nodeIndex),
+	   			counter = 0,
+	   			counterHead = 0,
+	   			nodeElement,
+	   			flag = false,
+	   			newHead = head;
+
+	   		if (nodeIndex === 0) {
+	   			nodeBeforeIndex = 0;	
+	   		}
+
+			if (nodeBeforeIndex < 0) {
+				nodeBeforeIndex = -1;
+			}
+
+			(function _updateHead (head) {
+				var current;
+
+				if (nodeBeforeIndex === 0) {
+					head = head['next'];
+					newHead = head;
+				} else if (counterHead === nodeBeforeIndex) {
+					head['next'] = nodeToRemove['next'];
+					return;
+				} else {
+					current = head;
+
+					if (null !== current && current.next) {
+						counterHead++;
+						_updateHead(current.next);
+					} else {
+						return;
+					}
+				}
+			})(head);
+
+			head = newHead;
+
+			if (nodeIndex < length) {
+				length--;
+			}
+			return newHead;
+	   };
+
+	   this.indexOf = function(element) {
+	   		var position = 0,
+	   			flag = false;
+
+			(function _searcherValue (head) {
+			  head = head || '';
+		      var current,
+		      	  headElement = head.element;
+
+		      if (headElement === element) {
+		      	flag = true;
+		      } else {
+		        current = head;
+
+		        if (current.next) {
+		        	position++;
+					_searcherValue(current.next);
+		        } else {
+		        	return;
+		        }
+		      }
+			})(head);
+
+			if (false === flag) {
+				position = -1;
+			}
+
+			return position;
+	   };
+
+	   this.getNodeByIndex = function(nodeIndex) {
+	   		var current,
+	   			counter = 0,
+	   			flag = false,
+	   			nodeElement = {};
+
+	   	(function _looper (head) {
+	   		if (counter === nodeIndex) {
+	   			flag = true;
+	   			nodeElement = head;
+	   		} else {
+	   			current = head;
+
+	   			if (null !== current && current.next) {
+	   				counter++;
+	   				_looper(current.next);
+	   			} 
+	   		}
+
+	   		if (false === flag) {
+	   			nodeElement = -1;
+	   		}
+	   	})(head);
+
+	   	return nodeElement;
+	   };
+
+	   this.isEmpty = function() {
+	   	if (length > 0) {
+	   		return false;
+	   	} else {
+	   		return true;
+	   	}
+	   };
+	   this.size = function() {
+	   	 return length;
+	   };
+	   this.toString = function() {
+	   		var counter = 0,
+	   			current,
+	   			returnData = '',
+	   			prop;
+
+	   		(function _looper (head) {
+	   			current = head || {};
+
+   				if (current.next) {
+   					counter++;
+   					returnData += current.element + ' - ' || '';
+   					_looper(current.next);
+   				} else {
+   					returnData += current.element || '';
+   				}
+	   		})(head);
+
+	   		return returnData;
+	   };
+	   this.print = function() {
+	      return head;
+	   };
+	}
+
+	var lista =  new DoublyLinkedList();
+
+	lista.append(10);
+	lista.append(20);
+	lista.append(30);
+	lista.append(40);
+	lista.append(50);
+
+	/*console.log(lista.remove(30));
+	console.log(lista.removeAt(0));
+	console.log(lista.getNodeByIndex(9));
+	console.log(lista.insert(3,'2,5'));
+	console.log(lista.removeAt(0));
+	console.log(lista.removeAt(0));
+	console.log(lista.removeAt(0));
+	console.log(lista.removeAt(0));
+	console.log(lista.removeAt(0));
+	lista.append(50);
+	console.log(lista.toString());
+	console.log(lista.size());
+	*/
+	lista.insert(4,'5,5');
+	console.log(lista.removeAt(0));
+	console.log(lista.print());
+	</script>
+
+</body>
+</html>

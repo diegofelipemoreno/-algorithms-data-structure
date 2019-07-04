@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Page Title</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+	<script>
+	function Set() {
+		this.items = {};
+
+		this.add = function(newItem) {
+			let addFlag = false,
+				objectToJson;
+
+			if (newItem.constructor.name === 'Object') {
+				objectToJson =  JSON.stringify(newItem);
+			}	
+
+			if (!this.has(newItem)) {
+				objectToJson = objectToJson || newItem;
+				this.items[objectToJson] = newItem;
+				addFlag = true;
+			}
+
+			return addFlag; 
+		}
+
+		this.remove = function(itemtoRemove) {
+			let setItems = this.items,
+				removeFlag = false;
+
+			for (item in setItems) {
+
+				if (item === itemtoRemove) {
+					delete setItems[item];
+					removeFlag = true;
+				} 
+			}
+
+			return removeFlag;
+		}
+
+		this.has = function(itemToSearch) {
+			let setItems = this.items,
+				objectToJson,
+				itemToJson,
+				item,
+				hasFlag = false;
+
+			if (itemToSearch.constructor.name === 'Object') {
+				objectToJson = JSON.stringify(itemToSearch);
+
+				for (item in setItems) {
+					itemToJson = JSON.stringify(setItems[item]);
+
+					if (objectToJson === itemToJson) {
+						hasFlag = true;
+					} 
+				}
+				
+			} else {
+				hasFlag = setItems.hasOwnProperty(itemToSearch);
+			}
+
+			return hasFlag;	
+		}
+
+		this.clear = function () {
+			this.items = {};
+		}
+
+		this.value = function () {
+			let setItems = this.items,
+				arrayValues = [],
+				stringToObject;
+
+			for (item in setItems) {
+
+				if (setItems.hasOwnProperty(item)) {
+					arrayValues.push(item);
+				}
+			}
+	
+			return arrayValues;
+		}
+
+		this.size = function () {
+			let setItems = this.items;
+
+			return Object.keys(setItems).length;
+		}
+
+		this.union = function (setToJoin) {
+			let setItems = this.items,
+				item;
+			Object.assign(setItems, setToJoin.items);
+		}
+
+		this.intersection = function (setToInsert) {
+			let setItems = this.items,
+				arrayItems = this.value(),
+				arraySecondSetItem = setToInsert.value(),
+				intersectionSet = new Set();
+
+			arraySecondSetItem.forEach(function (itemSecondSet) {
+
+				arrayItems.forEach(function (itemSet) {
+							
+					if (itemSecondSet === itemSet) {
+						intersectionSet.add(itemSecondSet);
+					}
+				})	
+			});
+			
+			return intersectionSet;	
+		}
+
+		this.difference = function (setToInsert) {
+			let setItems = this.items;
+				arrayItems = this.value(),
+				arraySecondSetItem = setToInsert.value();
+
+			arraySecondSetItem.forEach(function (itemSecondSet) {
+
+				arrayItems.forEach(function (itemSet) {
+							
+					if (itemSecondSet === itemSet) {
+						delete setItems[itemSet];
+					}
+				})	
+			});
+		}
+
+		this.subset = function (setToSubset) {
+			let self = this,
+				setItems = this.items,
+				arrayItems = this.value(),
+				arraySecondSetItem = setToSubset.value(),
+				i;
+
+			if (this.size() > setToSubset.size()) {	
+				return	false;
+			} else {
+				for	(i = 0;	i < arrayItems.length; i++) {
+
+					if (!setToSubset.has(arrayItems[i])) {
+						return false;
+					}
+				};
+				return true;
+			}
+		}
+	}
+
+/*
+	let mySet = new Set();
+
+	mySet.add('uno');
+	mySet.add({'complejo': 8790});
+	mySet.add(['a', 'b', 'c']);
+	mySet.add('tres');
+	mySet.add({'cuatro':4});
+	mySet.add('cinco');
+	mySet.add({'id':5});
+	//mySet.remove('tres');
+	//mySet.clear();
+
+	let mySetCopia = new Set();
+	mySetCopia.add('uno');
+	mySetCopia.add('tres');
+	mySetCopia.add(['a', 'b', 'c']);
+*/
+	//mySet.intersection(mySetCopia)
+
+	var	setA = new Set();
+		setA.add(1);
+		setA.add(2);
+	
+	var	setB = new Set();
+		setB.add(1);
+		setB.add(2);
+		setB.add(3);
+	
+	var	setC = new Set();
+		setC.add(2);
+		setC.add(3);
+		setC.add(4);
+
+
+	console.log(setA.subset(setB)); 
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Page Title</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+
+	<script>
+		function Dictionary () {
+			this.items = {};
+
+			this.set = function (key, value) {
+				this.items[key] = value;
+			}
+
+			this.remove = function (key) {
+				if (this.has(key)) {
+					delete this.items[key];
+					return true;
+				} 
+
+				return false;
+			}
+
+			this.get = function (key) {
+				
+				if (this.items[key]) {
+					return this.items[key];
+				} 
+				
+				return -1;
+			}
+
+			this.clear = function () {
+				this.items = {};
+			}
+
+			this.size = function () {
+				return Object.keys(this.items).length;
+			}
+
+			this.keys = function () {
+				let prop,
+					arrayKeys = [];
+
+				for (prop in this.items) {
+					arrayKeys.push(prop);
+				}
+
+				return arrayKeys;
+			}
+
+			this.values = function () {
+				let prop,
+					arrayValues = [];
+
+				for (prop in this.items) {
+					arrayValues.push(this.items[prop]);
+				}
+
+				return arrayValues;
+			}
+
+			this.has = function (key) {
+				return this.items.hasOwnProperty(key)
+			}
+
+			this.getItems = function () {
+				return this.items;
+			}
+		}
+
+		function Queue() {
+			var	items =	[];
+			
+			this.enqueue = function (element) {
+				items.push(element);
+			};
+
+			this.dequeue = function () {
+				return items.shift();
+			};
+
+			this.front = function () {
+				return	items[0];
+			};
+
+			this.isEmpty = function () {
+				return	items.length ==	0;
+			};
+
+			this.clear = function () {
+				items = [];
+			};
+
+		  	this.size =	function () {
+		  		return	items.length;
+		  	};
+
+			this.print = function () {
+				console.log(items.toString());
+			}; 
+		} 
+
+		function Graph() {
+			var vertices = [],
+				adjList = new Dictionary(),
+				initializeColor;
+
+			initializeColor = function () {
+				var color = [],
+					i;
+
+				for (i = 0; i < vertices.length; i++) {
+					color[vertices[i]] = 'white';
+				}
+				return color;
+			}
+
+			this.bfs = function(vertice, callback) {
+				var color = initializeColor(),
+					queue = new Queue(),
+					u,
+					neighbors,
+					w,
+					distance = [],
+					predecessors = [];
+
+				queue.enqueue(vertice);
+
+				//initailizong values	
+				for	(var j=0; j < vertices.length; j++){
+					distance[vertices[j]] = 0;
+					predecessors[vertices[j]] =	null;
+				}
+
+
+				while (!queue.isEmpty()) {
+					u = queue.dequeue(),
+					neighbors = adjList.get(u);
+					color[u] = 'grey';			
+
+					for (var i = 0; i < neighbors.length; i++) {
+						w = neighbors[i];
+
+						if (color[w] === 'white') {
+							color[w] = 'grey';
+							predecessors[w] = u;
+							distance[w] = distance[u] + 1;
+							queue.enqueue(w);
+						}
+					}
+
+					color[u] = 'black';
+
+					if (callback) {
+						callback(u);
+						//console.log(predecessors, '-->');
+						//console.log(distance, '-->');
+					}
+				}
+			}
+
+			this.printRoutes = function (predecessors) {
+				console.log(predecessors, '-->');
+				var neighbors,
+					output = '';
+/*
+				for (var i = 0; i < vertices.length; i++) {
+					neighbors = adjList.get(vertices[i]);
+
+					for (var j = 0; j < neighbors.length; j++) {
+	
+						if (neighbors[j] !== predecessors[vertices[i]]) {
+							//console.log(vertices[i], neighbors[j], '-->', predecessors[vertices[i]]);
+							output += vertices[i] + ' ' + neighbors[j] + '\n';
+						}
+					}
+				}
+*/
+				var primeNeighbors = adjList.get(vertices[0]);
+
+				primeNeighbors.forEach(function (elem) {
+					_looper(elem);
+				});
+			
+				function _looper (vertice) {
+					neighbors = adjList.get(vertice);
+					output = output || vertices[0];
+
+					for (var i = 0; i < neighbors.length; i++) {
+						if (neighbors[i] !== predecessors[vertice]) {
+							output += ' ' + neighbors[i];
+							//_looper(neighbors[i]);
+						}
+					}
+					output += '\n';
+				};
+
+				console.log(output);
+			}
+
+			this.dfs = function(callback) {
+				var color = initializeColor(),
+					i,
+					d = [],
+					f = [],
+					p = [],
+					j,
+					time = 0;
+
+				for	(l=0; l < vertices.length;	l++){
+					f[vertices[l]] = 0;
+					d[vertices[i]] = 0;
+					p[vertices[i]] = null;
+				}	
+
+				for (i = 0; i < vertices.length; i++) {
+					
+					if (color[[vertices[i]]] === 'white') {
+						dfsVisit(vertices[i], color, callback);
+					}
+				}
+
+				return {
+					discovery: d,
+					finished: f,
+					predecessors: p
+				}
+
+				function dfsVisit (u, color, callback) {
+					var neighbors,
+						k,
+						w;
+
+					color[u] = 'grey';
+					time = time + 1;
+					d[u] = ++time
+
+					if (callback) {
+						callback(u);
+					}
+
+					neighbors = adjList.get(u);
+					for (k = 0; k < neighbors.length; k++) {
+						w = neighbors[k];
+
+						if (color[w] === 'white') {
+							p[w] = u;
+							dfsVisit(w, color, callback);
+						}
+					}
+					color[u] = 'black';
+					f[u] = ++time;
+					console.log('explored ' + u); 
+				}
+			}
+
+			this.addVertex = function (vertice) {
+				vertices.push(vertice);
+				adjList.set(vertice, []);
+			}
+
+			this.addEdge = function (vertice1, vertice2) {
+				adjList.get(vertice1).push(vertice2);
+
+				if (-1 === adjList.get(vertice2)) {
+					this.addVertex(vertice2);
+				}
+
+				adjList.get(vertice2).push(vertice1);
+			}
+
+			this.print =  function () {
+				console.log('vertices', vertices);
+				console.log('adjacente lista', adjList.getItems());
+			}
+
+			this.toString =  function () {
+				var output = '',
+					i;
+
+				for (i = 0; i < vertices.length; i++) {
+					stringAdjList = '';
+
+					adjList.get(vertices[i]).forEach(function (elem) {
+						stringAdjList += elem + ' '; 
+					});
+
+				 	output += vertices[i] + ' -> ' + stringAdjList + '\n';
+				 } 
+				
+				return output;
+			}
+		}
+
+		function printNode(value){
+			console.log('Visited vertex: ' + value);
+		}
+
+		var graph = new Graph();
+
+		console.log(graph.print());
+		console.log('---------->');
+		
+
+		var	myVertices = ['A','B','C','D','E','F','G','H','I'];
+		for	(var i=0; i < myVertices.length; i++){
+			graph.addVertex(myVertices[i]); 
+		}
+		graph.addEdge('A', 'B');
+		graph.addEdge('A', 'C');
+		graph.addEdge('A', 'D');
+		graph.addEdge('C', 'D');
+		graph.addEdge('C', 'G');
+		graph.addEdge('D', 'G');
+		graph.addEdge('D', 'H');
+		graph.addEdge('B', 'E');
+		graph.addEdge('B', 'F');
+		graph.addEdge('E', 'I');
+
+		console.log(graph.toString());
+
+		console.log('---------->');
+		//graph.bfs(myVertices[0]);
+		graph.dfs(printNode); 
+		//console.log(shortestPathA); 
+	</script>
+
+</body>
+</html>
